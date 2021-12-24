@@ -2,6 +2,7 @@ from random import randint
 import math
 from Cryptodome.Random import get_random_bytes
 import time
+from Cryptodome.Cipher import AES
 
 
 def generatePQ():

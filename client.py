@@ -2,15 +2,14 @@ import socket
 import threading
 import tkinter
 import tkinter.scrolledtext
-from tkinter import  simpledialog
+from tkinter import simpledialog
 import pickle
-import hashlib
+from Cryptodome.Hash import HMAC, SHA256
 
 # ---------------------------custom imports---------------------
 from configs.keygen import key_generation
 from configs.AES import AESCipher
 from configs.RSA import RSACipher
-from Cryptodome.Hash import HMAC,SHA256
 
 # server ip address and port no
 IP_ADDRESS = '127.0.0.1'
@@ -111,8 +110,7 @@ class Client:
 
         # get msg from the user
         message = f"{self.input_area.get('1.0','end')}"
-        h256 = hashlib.sha256(message.encode('utf-8')).hexdigest()
-        hmac=HMAC.new(self.AES.key,digestmod=SHA256)
+        hmac = HMAC.new(self.AES.key, digestmod=SHA256)
         hmac.update(message.encode('utf-8'))
         # normal msg send to server
         lenght = len(message)
@@ -154,21 +152,18 @@ class Client:
                 h256 = msg_hash[1]
 
                 print('\nReceived CT: ', message)
-                print('\nReceived HMCA: ',h256)
-                
+                print('\nReceived HMCA: ', h256)
 
                 # decrypt the cipher using session key
                 message = self.AES.decrypt(message)
 
-
-                #rehash the messageg
-                hmac= HMAC.new(self.AES.key
-                ,digestmod=SHA256)
+                # rehash the messageg
+                hmac = HMAC.new(self.AES.key, digestmod=SHA256)
                 hmac.update(message)
 
                 # compute hash for the msg and verify with received hash
                 if(hmac.digest() == h256):
-                    
+
                     message = message.decode('utf-8')
                     if self.gui_done:
                         if message == 'exit':
